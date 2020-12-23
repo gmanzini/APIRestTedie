@@ -204,6 +204,10 @@
     <Compile Include="CONTEUDO.cs">
       <DependentUpon>Tedie.tt</DependentUpon>
     </Compile>
+    <Compile Include="Controllers\CartaoController.cs" />
+    <Compile Include="Controllers\CheckoutController.cs" />
+    <Compile Include="Controllers\CupomController.cs" />
+    <Compile Include="Controllers\PerfilController.cs" />
     <Compile Include="CUPOM.cs">
       <DependentUpon>Tedie.tt</DependentUpon>
     </Compile>
@@ -230,7 +234,6 @@
     </Compile>
     <Compile Include="Controllers\EnderecoController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

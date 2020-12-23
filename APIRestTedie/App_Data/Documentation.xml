@@ -481,6 +481,33 @@
             </summary>
             <param name="documentPath">The physical path to XML document.</param>
         </member>
+        <member name="M:APIRestTedie.Controllers.CartaoController.Post(APIRestTedie.CARTAO)">
+            <summary>
+            Cadastro de cartões
+            </summary>
+            <param name="cartao"></param>
+        </member>
+        <member name="M:APIRestTedie.Controllers.CheckoutController.Post(APIRestTedie.PEDIDO)">
+            <summary>
+            Cadastro de pedido e itens do pedido
+            </summary>
+            <param name="pedido"></param>
+        </member>
+        <member name="M:APIRestTedie.Controllers.CupomController.GetCupons(System.Int32)">
+            <summary>
+            Busca de cupons de um determinado usuário
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:APIRestTedie.Controllers.PerfilController.GetDadosUsuario(System.Int32)">
+            <summary>
+            Dados do usuário utilizados na tela
+             de perfil do usuário.
+            </summary>
+            <param name="idUsuario"></param>
+            <returns></returns>
+        </member>
         <member name="M:APIRestTedie.Controllers.EnderecoController.GetEnderecoPorID(System.Int32)">
             <summary>
             Recupera lista de endereços do cliente

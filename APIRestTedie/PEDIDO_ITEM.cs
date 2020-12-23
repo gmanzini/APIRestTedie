@@ -9,11 +9,14 @@
 
 namespace APIRestTedie
 {
+    using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
-    
+    using System.ComponentModel.DataAnnotations.Schema;
+
     public partial class PEDIDO_ITEM
     {
+        [JsonIgnore]
         public int NUMERO_PEDIDO { get; set; }
         public int IDPRODUTO { get; set; }
         public Nullable<int> QTDE { get; set; }
