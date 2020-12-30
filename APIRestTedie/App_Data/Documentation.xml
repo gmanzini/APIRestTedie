@@ -487,6 +487,26 @@
             </summary>
             <param name="cartao"></param>
         </member>
+        <member name="T:APIRestTedie.Controllers.CategoriaController">
+            <summary>
+            Controller para enndpoints de categorias
+            </summary>
+        </member>
+        <member name="M:APIRestTedie.Controllers.CategoriaController.GetCategoria">
+            <summary>
+            Todas categorias de nivel master
+            </summary>
+            <returns></returns>
+            
+        </member>
+        <member name="M:APIRestTedie.Controllers.CategoriaController.GetSubCategoria(System.Int32)">
+            <summary>
+            Sub-Categorias de uma determinada categoria
+            </summary>
+            <param name="idCategoria"></param>
+            <returns></returns>
+            
+        </member>
         <member name="M:APIRestTedie.Controllers.CheckoutController.Post(APIRestTedie.PEDIDO)">
             <summary>
             Cadastro de pedido e itens do pedido
@@ -500,12 +520,47 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:APIRestTedie.Controllers.LoginController.Post(System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="email"></param>
+            <param name="senha"></param>
+        </member>
         <member name="M:APIRestTedie.Controllers.PerfilController.GetDadosUsuario(System.Int32)">
             <summary>
             Dados do usuário utilizados na tela
              de perfil do usuário.
             </summary>
             <param name="idUsuario"></param>
+            <returns></returns>
+        </member>
+        <member name="M:APIRestTedie.Controllers.ProdutoController.GetProduto(System.Int32)">
+            <summary>
+            Busca de um produto específico
+            </summary>
+            <param name="idProduto"></param>
+            <returns></returns>
+            
+        </member>
+        <member name="M:APIRestTedie.Controllers.ProdutoController.GetProdutos(System.Int32,System.Int32,System.Int32,System.String,System.String,System.Nullable{System.Double},System.Nullable{System.Double})">
+            <summary>
+            
+            </summary>
+            <param name="subcategoria"></param>
+            <param name="offset"></param>
+            <param name="limit"></param>
+            <param name="search"></param>
+            <param name="order">maisvendidos,lancamentos</param>
+            <param name="minpreco"></param>
+            <param name="maxpreco"></param>
+            <returns></returns>
+        </member>
+        <member name="M:APIRestTedie.Controllers.ProdutoController.RemoveAccents(System.String)">
+            <summary>
+            Método auxiliar para remover acentos
+            </summary>
+            <param name="text"></param>
             <returns></returns>
         </member>
         <member name="M:APIRestTedie.Controllers.EnderecoController.GetEnderecoPorID(System.Int32)">

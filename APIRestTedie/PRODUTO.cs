@@ -32,5 +32,6 @@ namespace APIRestTedie
         public Nullable<int> VIEWS { get; set; }
         public string TIPO { get; set; }
         public string LINKPRODUTO { get; set; }
+        public string DESTAQUE { get; set; }
     }
 }

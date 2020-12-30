@@ -10,7 +10,7 @@ namespace APIRestTedie.Controllers
     public class PerfilController : ApiController
     {
 
-        trampowEntities context = new trampowEntities();
+        trampowEntidades context = new trampowEntidades();
         // GET: api/Perfil/5
         /// <summary>
         /// Dados do usuário utilizados na tela
@@ -21,12 +21,12 @@ namespace APIRestTedie.Controllers
         public dynamic GetDadosUsuario(int idUsuario)
         {
             dynamic lst = (
-                 from p in context.USUARIOs
-                 join c in context.CLIENTEs on
+                 from p in context.USUARIO
+                 join c in context.CLIENTE on
                  p.IDCLIENTE equals c.IDCLIENTE
                  join cp in context.CLIENTE_PERFIL on 
                  c.IDCLIENTE equals cp.IDCLIENTE
-                 join pf in context.PERFILs on
+                 join pf in context.PERFIL on
                  cp.IDPERFIL equals pf.IDPERFIL
                  where p.IDCLIENTE == idUsuario
                  select new

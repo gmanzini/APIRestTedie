@@ -14,10 +14,16 @@ namespace APIRestTedie.Controllers
     
     public class EnderecoController : ApiController
     {
-        trampowEntities context = new trampowEntities();
-
+        trampowEntidades context = new trampowEntidades();
+        /// <summary>
+        /// Buscar endereço por localização
+        /// </summary>
+        /// <param name="lat"></param>
+        /// <param name="longt"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("endereco/geolocalizacao")]
+        
         public async Task<CLIENTE_ENDERECO> GetEnderecoByGeoLoc(string lat,string longt)
         {
             Geolocation end = new Geolocation();
@@ -43,6 +49,43 @@ namespace APIRestTedie.Controllers
             endereco.BAIRRO = dadosend.address_components.FirstOrDefault(w => w.types.Contains("sublocality")).long_name;
             return endereco;
         }
+        // DELETE: api/enderecos/{idEndereco}
+        /// <summary>
+        /// Excluir um endereço específico através de um ID
+        /// </summary>
+        /// <param name="idEndereco"></param>
+        public void Delete(int idEndereco)
+        {
+            var endereco = context.CLIENTE_ENDERECO.Where(w => w.IDENDERECO == idEndereco).FirstOrDefault();
+            context.CLIENTE_ENDERECO.Remove(endereco);
+            context.SaveChanges();
+        }
+        // PUT: api/enderecos/{idEndereco}
+        /// <summary>
+        /// Editar dados de um endereço
+        /// </summary>
+
+        /// <param name="endereco"></param>
+        public CLIENTE_ENDERECO Put([FromBody]CLIENTE_ENDERECO endereco)
+        {
+            context.CLIENTE_ENDERECO
+            .Where(p => p.IDENDERECO == endereco.IDENDERECO)
+            .ToList()
+            .ForEach(x =>
+            {
+                x.BAIRRO = endereco.BAIRRO;
+                x.CEP = endereco.CEP;
+                x.CIDADE = endereco.CIDADE;
+                x.COMPLEMENTO = endereco.COMPLEMENTO;
+                x.ENDERECO = endereco.ENDERECO;
+                x.IDCLIENTE = endereco.IDCLIENTE;
+                x.IDENDERECO = endereco.IDENDERECO;
+                x.NUM = endereco.NUM;
+                x.UF = endereco.UF;
+            });
+            context.SaveChanges();
+            return endereco;
+        }
         /// <summary>
         /// Recupera lista de endereços do cliente
         /// </summary>
@@ -64,7 +107,7 @@ namespace APIRestTedie.Controllers
         /// <param name="cep"></param>
         /// <returns></returns>
         ///  [HttpGet]
-        [Route("endereco/cep/{cep}")]
+        [Route("endereco/{cep}")]
         public  async Task<EnderecoCEP> GetEnderecoPorCEP(string cep)
         {
             ServicePointManager.Expect100Continue = true;

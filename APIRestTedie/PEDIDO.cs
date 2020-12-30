@@ -12,13 +12,10 @@ namespace APIRestTedie
     using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations.Schema;
-
+    
     public partial class PEDIDO
     {
-        [NotMapped]
         public List<PEDIDO_ITEM> ITEMS { get; set; }
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [JsonIgnore]
         public int NUMERO_PEDIDO { get; set; }
         public Nullable<int> IDCLIENTE { get; set; }

@@ -9,15 +9,15 @@ namespace APIRestTedie.Controllers
 {
     public class CupomController : ApiController
     {
-        trampowEntities context = new trampowEntities();
+        trampowEntidades context = new trampowEntidades();
         /// <summary>
         /// Busca de cupons de um determinado usuário
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="idCliente"></param>
         /// <returns></returns>
         public dynamic GetCupons(int idCliente)
         {
-            dynamic lst = (from c in context.CUPOMs
+            dynamic lst = (from c in context.CUPOM
                                                 join e in context.CUPOM_CLIENTE
                        on c.IDCUPOM equals e.IDCUPOM
                                                 select new

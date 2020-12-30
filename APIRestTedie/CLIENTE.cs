@@ -9,11 +9,13 @@
 
 namespace APIRestTedie
 {
+    using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
     
     public partial class CLIENTE
     {
+        [JsonIgnore]
         public int IDCLIENTE { get; set; }
         public string NOME { get; set; }
         public string EMAIL { get; set; }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BoletoFacilSDK;
+using BoletoFacilSDK.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -10,16 +12,17 @@ namespace APIRestTedie.Controllers
     public class CartaoController : ApiController
     {
 
-        trampowEntities context = new trampowEntities();
+        trampowEntidades context = new trampowEntidades();
         // POST: api/Cartao
         /// <summary>
         /// Cadastro de cartões
         /// </summary>
         /// <param name="cartao"></param>
-        public void Post([FromBody]CARTAO cartao)
-        {           
-            context.CARTAOs.Add(cartao);
+        public string Post([FromBody]CARTAO cartao)
+        {
+            context.CARTAO.Add(cartao);
             context.SaveChanges();
+            return cartao.HASH;
         }
 
     }

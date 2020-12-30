@@ -9,15 +9,15 @@ namespace APIRestTedie.Controllers
 {
     public class CheckoutController : ApiController
     {
-        trampowEntities context = new trampowEntities();
+        trampowEntidades context = new trampowEntidades();
         /// <summary>
         /// Cadastro de pedido e itens do pedido
         /// </summary>
         /// <param name="pedido"></param>
         // POST: api/Checkout
-        public void Post([FromBody]PEDIDO pedido)
+        public dynamic Post([FromBody]PEDIDO pedido)
         {
-            context.PEDIDOes.Add(pedido);
+            context.PEDIDO.Add(pedido);
             context.SaveChanges();
             int id = pedido.NUMERO_PEDIDO;
 
@@ -27,7 +27,7 @@ namespace APIRestTedie.Controllers
                 context.PEDIDO_ITEM.Add(item);
             }
             context.SaveChanges();
-            
+            return pedido;
         }
 
     }

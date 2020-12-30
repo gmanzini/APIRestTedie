@@ -12,8 +12,7 @@ namespace APIRestTedie
     using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations.Schema;
-
+    
     public partial class PEDIDO_ITEM
     {
         [JsonIgnore]
