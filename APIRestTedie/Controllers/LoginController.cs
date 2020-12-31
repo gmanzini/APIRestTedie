@@ -1,4 +1,5 @@
-﻿using System;
+﻿using APIRestTedie.Util;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -19,7 +20,8 @@ namespace APIRestTedie.Controllers
         /// <param name="senha"></param>
         public dynamic Login(string email,string senha)
         {
-          //  bool exists = context.USUARIOs.Any(w => w.SENHA == senha && w.EMAIL == email);
+            //  bool exists = context.USUARIOs.Any(w => w.SENHA == senha && w.EMAIL == email);
+            var token = Utils.Base64Encode(email);
             var user = (from p in context.USUARIO
                         where p.SENHA == senha && p.EMAIL == email
                        select new
@@ -27,10 +29,18 @@ namespace APIRestTedie.Controllers
                            p.EMAIL,
                            p.IDCLIENTE,
                            p.STATUS,
-                           message = p.EMAIL == null ?  "usuário não encontrado" : "Login efetuado com sucesso"
+                           Message = p.EMAIL == null ?  "usuário não encontrado" : "Login efetuado com sucesso",
+                           Token = token
                        });
-            
-            return Ok(user);//  AsQueryable<string,int,string>();
+            if (user.Any())
+            {
+                return user;
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "Login Inválido") ;
+            }
+            //return user.Any() ? user : new { EMAIL = email,IDCLIENTE = 0,STATUS = "",Message = "Login Inválido",Token ="" } as Queryable<string,int,string,string,string>;//  AsQueryable<string,int,string>();
         }
 
     }

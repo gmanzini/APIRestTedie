@@ -1,4 +1,5 @@
-﻿using System;
+﻿using APIRestTedie.Util;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -16,9 +17,16 @@ namespace APIRestTedie.Controllers
         /// 
         /// </summary>
         /// <returns></returns>
-        public dynamic GetBanners()
+        public dynamic GetBanners(string token)
         {
-            return context.APP_BANNER.ToList();
+            if (Utils.ValidateToken(token))
+            {
+                return context.APP_BANNER.ToList();
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized,"Token Inválido");
+            }
         }
 
 

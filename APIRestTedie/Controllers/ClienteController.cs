@@ -1,4 +1,5 @@
-﻿using System;
+﻿using APIRestTedie.Util;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -20,11 +21,19 @@ namespace APIRestTedie.Controllers
         /// Cadastro de Clientes
         /// </summary>
         /// <param name="Cliente"></param>
-        public CLIENTE Post([FromBody]CLIENTE Cliente)
+        public dynamic Post([FromBody]CLIENTE Cliente,string token)
         {
-            context.CLIENTE.Add(Cliente);
-            context.SaveChanges();
-            return Cliente;
+            if (Utils.ValidateToken(token))
+            {
+                context.CLIENTE.Add(Cliente);
+                context.SaveChanges();
+                return Cliente;
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "Token Inválido");
+            }
+           
         }
 
 

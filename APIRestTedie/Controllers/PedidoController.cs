@@ -1,4 +1,5 @@
-﻿using System;
+﻿using APIRestTedie.Util;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -18,30 +19,38 @@ namespace APIRestTedie.Controllers
         /// <returns></returns>
         /// 
         [Route("api/usuário/{idUsuario}/pedidos")]
-        public dynamic GetPedidos(int idUsuario)
+        public dynamic GetPedidos(int idUsuario,string token)
         {
-            dynamic lst = (from c in context.PEDIDO
-                           join e in context.PEDIDO_ITEM
-                           on c.NUMERO_PEDIDO equals e.NUMERO_PEDIDO
-                           select new
-                           {
-                              c.NUMERO_PEDIDO,
-                             c.DESCONTO,
-                             c.FRETE,
-                             c.OBSERVACAO,
-                             c.PONTOS,
-                             c.QTDEPARCELA,
-                             c.STATUS,
-                             c.TIPOVENDA,
-                             c.IDCLIENTE,
-                             e.IDPRODUTO,
-                             e.QTDE,
-                             e.VALOR,
-                             e.VALOR_UNIT                          
-                             
-                           }).Where(w=> w.IDCLIENTE == idUsuario ).ToList();
+            if (Utils.ValidateToken(token))
+            {
+                dynamic lst = (from c in context.PEDIDO
+                               join e in context.PEDIDO_ITEM
+                               on c.NUMERO_PEDIDO equals e.NUMERO_PEDIDO
+                               select new
+                               {
+                                   c.NUMERO_PEDIDO,
+                                   c.DESCONTO,
+                                   c.FRETE,
+                                   c.OBSERVACAO,
+                                   c.PONTOS,
+                                   c.QTDEPARCELA,
+                                   c.STATUS,
+                                   c.TIPOVENDA,
+                                   c.IDCLIENTE,
+                                   e.IDPRODUTO,
+                                   e.QTDE,
+                                   e.VALOR,
+                                   e.VALOR_UNIT
 
-            return lst;
+                               }).Where(w => w.IDCLIENTE == idUsuario).ToList();
+
+                return lst;
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "Token Inválido");
+            }
+           
         }
 
 
@@ -52,30 +61,38 @@ namespace APIRestTedie.Controllers
         /// <returns></returns>
         /// 
         [Route("api/pedidos/{idPedido}")]
-        public dynamic Get(int idPedido)
+        public dynamic Get(int idPedido,string token)
         {
-            dynamic lst = (from c in context.PEDIDO
-                           join e in context.PEDIDO_ITEM
-                           on c.NUMERO_PEDIDO equals e.NUMERO_PEDIDO
-                           select new
-                           {
-                               c.NUMERO_PEDIDO,
-                               c.DESCONTO,
-                               c.FRETE,
-                               c.OBSERVACAO,
-                               c.PONTOS,
-                               c.QTDEPARCELA,
-                               c.STATUS,
-                               c.TIPOVENDA,
-                               c.IDCLIENTE,
-                               e.IDPRODUTO,
-                               e.QTDE,
-                               e.VALOR,
-                               e.VALOR_UNIT
+            if (Utils.ValidateToken(token))
+            {
+                dynamic lst = (from c in context.PEDIDO
+                               join e in context.PEDIDO_ITEM
+                               on c.NUMERO_PEDIDO equals e.NUMERO_PEDIDO
+                               select new
+                               {
+                                   c.NUMERO_PEDIDO,
+                                   c.DESCONTO,
+                                   c.FRETE,
+                                   c.OBSERVACAO,
+                                   c.PONTOS,
+                                   c.QTDEPARCELA,
+                                   c.STATUS,
+                                   c.TIPOVENDA,
+                                   c.IDCLIENTE,
+                                   e.IDPRODUTO,
+                                   e.QTDE,
+                                   e.VALOR,
+                                   e.VALOR_UNIT
 
-                           }).Where(w => w.NUMERO_PEDIDO == idPedido).ToList();
+                               }).Where(w => w.NUMERO_PEDIDO == idPedido).ToList();
 
-            return lst;
+                return lst;
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "Token Inválido");
+            }
+          
         }
 
     }

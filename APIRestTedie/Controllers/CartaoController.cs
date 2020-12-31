@@ -1,4 +1,5 @@
-﻿using System;
+﻿using APIRestTedie.Util;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -16,11 +17,19 @@ namespace APIRestTedie.Controllers
         /// Cadastro de cartões
         /// </summary>
         /// <param name="cartao"></param>
-        public string Post([FromBody]CARTAO cartao)
+        public dynamic Post([FromBody]CARTAO cartao,string token)
         {
-            context.CARTAO.Add(cartao);
-            context.SaveChanges();
-            return cartao.HASH;
+            if (Utils.ValidateToken(token))
+            {
+                context.CARTAO.Add(cartao);
+                context.SaveChanges();
+                return cartao.HASH;
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "Token Inválido");
+            }
+            
         }
 
     }

@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Web.Http;
+using System.Web.UI.WebControls;
 
 namespace APIRestTedie.Controllers
 {
@@ -22,33 +23,43 @@ namespace APIRestTedie.Controllers
         /// <returns></returns>
         /// 
         [Route("api/produtos/{idProduto}")]
-        public dynamic GetProduto(int idProduto)
+        public dynamic GetProduto(int idProduto,string token)
         {
-            dynamic product = (from p in context.PRODUTO
-                               join c in context.CATEGORIA
-                               on p.IDCATEGORIA equals c.IDCATEGORIA
-                               select new
-                               {
-                                   c.NOMECATEGORIA,
-                                   p.DESCRICAO_BREVE,
-                                   p.DESCRICAO_COMPLETA,
-                                   p.GARANTIA,
-                                   p.IDCATEGORIA,
-                                   p.DATACADASTRO,
-                                   p.IDPRODUTO,
-                                   p.LINKPRODUTO,
-                                   p.METADESCRICAO,
-                                   p.METATAGS,
-                                   p.MINIATURA,
-                                   p.STATUS,
-                                   p.TIPO,
-                                   p.TITULO,
-                                   p.VALOR,
-                                   p.VALOR_PROMOCIONAL,
-                                   p.VIEWS,
-                               }).FirstOrDefault(w => w.IDPRODUTO == idProduto);
+            if (Utils.ValidateToken(token))
+            {
+                dynamic product = (from p in context.PRODUTO
+                                   join c in context.CATEGORIA
+                                   on p.IDCATEGORIA equals c.IDCATEGORIA
+                                   select new
+                                   {
+                                       c.NOMECATEGORIA,
+                                       p.DESCRICAO_BREVE,
+                                       p.DESCRICAO_COMPLETA,
+                                       p.GARANTIA,
+                                       p.IDCATEGORIA,
+                                       p.DATACADASTRO,
+                                       p.IDPRODUTO,
+                                       p.LINKPRODUTO,
+                                       p.METADESCRICAO,
+                                       p.METATAGS,
+                                       p.MINIATURA,
+                                       p.STATUS,
+                                       p.TIPO,
+                                       p.TITULO,
+                                       p.VALOR,
+                                       p.VALOR_PROMOCIONAL,
+                                       p.VIEWS,
+                                   }).FirstOrDefault(w => w.IDPRODUTO == idProduto);
 
-            return product;
+                return product;
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "Token Inválido");
+            }
+           
+
+         
 
 
         }
@@ -58,34 +69,42 @@ namespace APIRestTedie.Controllers
         /// <returns></returns>
         /// 
         [Route("api/home/destaque")]
-        public dynamic GetProdutosHome()
+        public dynamic GetProdutosHome(string token)
         {
-            dynamic products = (from p in context.PRODUTO
-                               join c in context.CATEGORIA
-                               on p.IDCATEGORIA equals c.IDCATEGORIA
-                               select new
-                               {
-                                   c.NOMECATEGORIA,
-                                   p.DESCRICAO_BREVE,
-                                   p.DESCRICAO_COMPLETA,
-                                   p.GARANTIA,
-                                   p.IDCATEGORIA,
-                                   p.DATACADASTRO,
-                                   p.IDPRODUTO,
-                                   p.LINKPRODUTO,
-                                   p.METADESCRICAO,
-                                   p.METATAGS,
-                                   p.MINIATURA,
-                                   p.STATUS,
-                                   p.TIPO,
-                                   p.TITULO,
-                                   p.VALOR,
-                                   p.VALOR_PROMOCIONAL,
-                                   p.VIEWS,
-                                   p.DESTAQUE
-                               }).Where(w=> w.DESTAQUE.ToUpper() == "S");
+            if (Utils.ValidateToken(token))
+            {
+                dynamic products = (from p in context.PRODUTO
+                                    join c in context.CATEGORIA
+                                    on p.IDCATEGORIA equals c.IDCATEGORIA
+                                    select new
+                                    {
+                                        c.NOMECATEGORIA,
+                                        p.DESCRICAO_BREVE,
+                                        p.DESCRICAO_COMPLETA,
+                                        p.GARANTIA,
+                                        p.IDCATEGORIA,
+                                        p.DATACADASTRO,
+                                        p.IDPRODUTO,
+                                        p.LINKPRODUTO,
+                                        p.METADESCRICAO,
+                                        p.METATAGS,
+                                        p.MINIATURA,
+                                        p.STATUS,
+                                        p.TIPO,
+                                        p.TITULO,
+                                        p.VALOR,
+                                        p.VALOR_PROMOCIONAL,
+                                        p.VIEWS,
+                                        p.DESTAQUE
+                                    }).Where(w => w.DESTAQUE.ToUpper() == "S");
 
-            return products;
+                return products;
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "Token Inválido");
+            }
+          
         }
         // GET: api/Produto
         /// <summary>
@@ -101,9 +120,8 @@ namespace APIRestTedie.Controllers
         /// <param name="maxpreco"></param>
         /// <returns></returns>
        // [Route("api/produtos/subcategoria={subcategoria}&offset={offset}&limit={limit}&search={search}&order={order}&minpreco={minpreco}&maxpreco={maxpreco}")]
-        public dynamic GetProdutos(int subcategoria, int offset, int limit, string search, string order, double? minpreco, double? maxpreco)
+        public dynamic GetProdutos(int subcategoria, int offset, int limit, string search, string order, double? minpreco, double? maxpreco,string token)
         {
-
             var query = (from p in context.PRODUTO
                          join c in context.CATEGORIA
                          on p.IDCATEGORIA equals c.IDCATEGORIA
@@ -134,47 +152,57 @@ namespace APIRestTedie.Controllers
                              AVALIACAO = context.SCORE_PRODUTO.Where(x => x.IDPRODUTO == p.IDPRODUTO).Average(x => x.SCORE)
                          }
                 );
-
-            switch (order)
+            if (Utils.ValidateToken(token))
             {
-                case "maisvendidos":
-                    query = query.OrderByDescending(w => w.QUANTIDADEVENDIDO).AsEnumerable()
+                switch (order)
+                {
+                    case "maisvendidos":
+                        query = query.OrderByDescending(w => w.QUANTIDADEVENDIDO).AsEnumerable()
+                                     .Where(w => Utils.RemoveAccents(w.TITULO).ToLower().Contains(Utils.RemoveAccents(search).ToLower()) && (w.VALOR > minpreco && w.VALOR < maxpreco))
+                                     .Skip(offset).Take(limit).AsQueryable();
+                        break;
+                    case "lancamentos":
+                        query = query.OrderByDescending(w => w.DATACADASTRO).AsEnumerable()
                                  .Where(w => Utils.RemoveAccents(w.TITULO).ToLower().Contains(Utils.RemoveAccents(search).ToLower()) && (w.VALOR > minpreco && w.VALOR < maxpreco))
-                                 .Skip(offset).Take(limit).AsQueryable();
-                    break;
-                case "lancamentos":
-                    query = query.OrderByDescending(w => w.DATACADASTRO).AsEnumerable()
+                               .Skip(offset).Take(limit).AsQueryable();
+                        break;
+                    case "maiorpreco":
+                        query = query.OrderByDescending(w => (w.VALOR_PROMOCIONAL != 0 && w.VALOR_PROMOCIONAL != null ? w.VALOR_PROMOCIONAL : w.VALOR)).AsEnumerable()
+                                .Where(w => Utils.RemoveAccents(w.TITULO).ToLower().Contains(Utils.RemoveAccents(search).ToLower()) && (w.VALOR > minpreco && w.VALOR < maxpreco))
+                               .Skip(offset).Take(limit).AsQueryable();
+                        break;
+                    case "menorpreco":
+                        query = query.OrderBy(w => (w.VALOR_PROMOCIONAL != 0 && w.VALOR_PROMOCIONAL != null ? w.VALOR_PROMOCIONAL : w.VALOR)).AsEnumerable()
                              .Where(w => Utils.RemoveAccents(w.TITULO).ToLower().Contains(Utils.RemoveAccents(search).ToLower()) && (w.VALOR > minpreco && w.VALOR < maxpreco))
-                           .Skip(offset).Take(limit).AsQueryable();
-                    break;
-                case "maiorpreco":
-                    query = query.OrderByDescending(w => (w.VALOR_PROMOCIONAL != 0 && w.VALOR_PROMOCIONAL != null ? w.VALOR_PROMOCIONAL : w.VALOR)).AsEnumerable()
+                            .Skip(offset).Take(limit).AsQueryable();
+                        break;
+                    case "relevancia":
+                        query = query.OrderByDescending(w => w.AVALIACAO).AsEnumerable()
                             .Where(w => Utils.RemoveAccents(w.TITULO).ToLower().Contains(Utils.RemoveAccents(search).ToLower()) && (w.VALOR > minpreco && w.VALOR < maxpreco))
-                           .Skip(offset).Take(limit).AsQueryable();
-                    break;
-                case "menorpreco":
-                    query = query.OrderBy(w => (w.VALOR_PROMOCIONAL != 0 && w.VALOR_PROMOCIONAL != null ? w.VALOR_PROMOCIONAL : w.VALOR)).AsEnumerable()
-                         .Where(w => Utils.RemoveAccents(w.TITULO).ToLower().Contains(Utils.RemoveAccents(search).ToLower()) && (w.VALOR > minpreco && w.VALOR < maxpreco))
-                        .Skip(offset).Take(limit).AsQueryable();
-                    break;
-                case "relevancia":
-                    query = query.OrderByDescending(w=> w.AVALIACAO).AsEnumerable()
-                        .Where(w => Utils.RemoveAccents(w.TITULO).ToLower().Contains(Utils.RemoveAccents(search).ToLower()) && (w.VALOR > minpreco && w.VALOR < maxpreco))
-                        .Skip(offset).Take(limit).AsQueryable();
-                    break;
-                case "maisbemavaliados":
-                    query = query.OrderByDescending(w => w.AVALIACAO).AsEnumerable()
-                         .Where(w => Utils.RemoveAccents(w.TITULO).ToLower().Contains(Utils.RemoveAccents(search).ToLower()) && (w.VALOR > minpreco && w.VALOR < maxpreco))
-                        .Skip(offset).Take(limit).AsQueryable();
-                    break;
+                            .Skip(offset).Take(limit).AsQueryable();
+                        break;
+                    case "maisbemavaliados":
+                        query = query.OrderByDescending(w => w.AVALIACAO).AsEnumerable()
+                             .Where(w => Utils.RemoveAccents(w.TITULO).ToLower().Contains(Utils.RemoveAccents(search).ToLower()) && (w.VALOR > minpreco && w.VALOR < maxpreco))
+                            .Skip(offset).Take(limit).AsQueryable();
+                        break;
 
-                default:
-                    query = query.AsEnumerable().Where(w => Utils.RemoveAccents(w.TITULO).ToLower().Contains(Utils.RemoveAccents(search).ToLower()) && (w.VALOR > minpreco && w.VALOR < maxpreco))
-                        .Skip(offset).Take(limit).AsQueryable();
-                    break;
+                    default:
+                        query = query.AsEnumerable().Where(w => Utils.RemoveAccents(w.TITULO).ToLower().Contains(Utils.RemoveAccents(search).ToLower()) && (w.VALOR > minpreco && w.VALOR < maxpreco))
+                            .Skip(offset).Take(limit).AsQueryable();
+                        break;
+                }
+
+                return query.ToList();
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "Token Inválido");
             }
 
-            return query.ToList();
+          
+
+         
         }
        
     }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using APIRestTedie.Util;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -15,19 +16,28 @@ namespace APIRestTedie.Controllers
         /// </summary>
         /// <param name="pedido"></param>
         // POST: api/Checkout
-        public dynamic Post([FromBody]PEDIDO pedido)
+        public dynamic Post([FromBody]PEDIDO pedido,string token)
         {
-            context.PEDIDO.Add(pedido);
-            context.SaveChanges();
-            int id = pedido.NUMERO_PEDIDO;
 
-            foreach (PEDIDO_ITEM item in pedido.ITEMS)
+            if (Utils.ValidateToken(token))
             {
-                item.NUMERO_PEDIDO = id;
-                context.PEDIDO_ITEM.Add(item);
+                context.PEDIDO.Add(pedido);
+                context.SaveChanges();
+                int id = pedido.NUMERO_PEDIDO;
+
+                foreach (PEDIDO_ITEM item in pedido.ITEMS)
+                {
+                    item.NUMERO_PEDIDO = id;
+                    context.PEDIDO_ITEM.Add(item);
+                }
+                context.SaveChanges();
+                return pedido;
             }
-            context.SaveChanges();
-            return pedido;
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "Token Inválido");
+            }
+          
         }
 
     }

@@ -1,5 +1,6 @@
 ﻿
 using APIRestTedie.Models;
+using APIRestTedie.Util;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ using System.Web.Http;
 
 namespace APIRestTedie.Controllers
 {
-    
+
     public class EnderecoController : ApiController
     {
         trampowEntidades context = new trampowEntidades();
@@ -23,42 +24,61 @@ namespace APIRestTedie.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("endereco/geolocalizacao")]
-        
-        public async Task<CLIENTE_ENDERECO> GetEnderecoByGeoLoc(string lat,string longt)
+
+        public async Task<dynamic> GetEnderecoByGeoLoc(string lat, string longt, string token)
         {
-            Geolocation end = new Geolocation();
-            using (HttpClient client = new HttpClient())
+            if (Utils.ValidateToken(token))
             {
-               
-                client.BaseAddress = new Uri("https://maps.googleapis.com/");
-                var resp = await client.GetAsync("/maps/api/geocode/json?latlng=-" +lat+",-"+longt+"&key=AIzaSyBoTECWyjxczIwsvLtysnPh2J45DXRRbU8");
-                if (resp.IsSuccessStatusCode)
+                Geolocation end = new Geolocation();
+                using (HttpClient client = new HttpClient())
                 {
-                    string response = resp.Content.ReadAsStringAsync().Result;
-                    end = JsonConvert.DeserializeObject<Geolocation>(response);
-                    
-                }                
+
+                    client.BaseAddress = new Uri("https://maps.googleapis.com/");
+                    var resp = await client.GetAsync("/maps/api/geocode/json?latlng=-" + lat + ",-" + longt + "&key=AIzaSyBoTECWyjxczIwsvLtysnPh2J45DXRRbU8");
+                    if (resp.IsSuccessStatusCode)
+                    {
+                        string response = resp.Content.ReadAsStringAsync().Result;
+                        end = JsonConvert.DeserializeObject<Geolocation>(response);
+
+                    }
+                }
+                CLIENTE_ENDERECO endereco = new CLIENTE_ENDERECO();
+                Result dadosend = end.results.FirstOrDefault();
+                endereco.CEP = dadosend.address_components.FirstOrDefault(w => w.types.Contains("postal_code")).long_name;
+                endereco.ENDERECO = dadosend.address_components.FirstOrDefault(w => w.types.Contains("route")).long_name;
+                endereco.NUM = dadosend.address_components.FirstOrDefault(w => w.types.Contains("street_number")).long_name;
+                endereco.UF = dadosend.address_components.FirstOrDefault(w => w.types.Contains("administrative_area_level_1")).long_name;
+                endereco.CIDADE = dadosend.address_components.FirstOrDefault(w => w.types.Contains("administrative_area_level_2")).long_name;
+                endereco.BAIRRO = dadosend.address_components.FirstOrDefault(w => w.types.Contains("sublocality")).long_name;
+                return endereco;
             }
-            CLIENTE_ENDERECO endereco = new CLIENTE_ENDERECO();
-            Result dadosend = end.results.FirstOrDefault();
-            endereco.CEP = dadosend.address_components.FirstOrDefault(w => w.types.Contains("postal_code")).long_name;
-            endereco.ENDERECO = dadosend.address_components.FirstOrDefault(w => w.types.Contains("route")).long_name;
-            endereco.NUM = dadosend.address_components.FirstOrDefault(w => w.types.Contains("street_number")).long_name;
-            endereco.UF = dadosend.address_components.FirstOrDefault(w => w.types.Contains("administrative_area_level_1")).long_name;
-            endereco.CIDADE = dadosend.address_components.FirstOrDefault(w => w.types.Contains("administrative_area_level_2")).long_name;
-            endereco.BAIRRO = dadosend.address_components.FirstOrDefault(w => w.types.Contains("sublocality")).long_name;
-            return endereco;
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "Token Inválido");
+            }
+
+
         }
         // DELETE: api/enderecos/{idEndereco}
         /// <summary>
         /// Excluir um endereço específico através de um ID
         /// </summary>
         /// <param name="idEndereco"></param>
-        public void Delete(int idEndereco)
+        public dynamic Delete(int idEndereco, string token)
         {
-            var endereco = context.CLIENTE_ENDERECO.Where(w => w.IDENDERECO == idEndereco).FirstOrDefault();
-            context.CLIENTE_ENDERECO.Remove(endereco);
-            context.SaveChanges();
+            if (Utils.ValidateToken(token))
+            {
+                var endereco = context.CLIENTE_ENDERECO.Where(w => w.IDENDERECO == idEndereco).FirstOrDefault();
+                context.CLIENTE_ENDERECO.Remove(endereco);
+                context.SaveChanges();
+                return Request.CreateResponse(HttpStatusCode.OK, "Endereço excluído com sucesso");
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "Token Inválido");
+            }
+
+
         }
         // PUT: api/enderecos/{idEndereco}
         /// <summary>
@@ -66,25 +86,34 @@ namespace APIRestTedie.Controllers
         /// </summary>
 
         /// <param name="endereco"></param>
-        public CLIENTE_ENDERECO Put([FromBody]CLIENTE_ENDERECO endereco)
+        public dynamic Put([FromBody]CLIENTE_ENDERECO endereco, string token)
         {
-            context.CLIENTE_ENDERECO
-            .Where(p => p.IDENDERECO == endereco.IDENDERECO)
-            .ToList()
-            .ForEach(x =>
+            if (Utils.ValidateToken(token))
             {
-                x.BAIRRO = endereco.BAIRRO;
-                x.CEP = endereco.CEP;
-                x.CIDADE = endereco.CIDADE;
-                x.COMPLEMENTO = endereco.COMPLEMENTO;
-                x.ENDERECO = endereco.ENDERECO;
-                x.IDCLIENTE = endereco.IDCLIENTE;
-                x.IDENDERECO = endereco.IDENDERECO;
-                x.NUM = endereco.NUM;
-                x.UF = endereco.UF;
-            });
-            context.SaveChanges();
-            return endereco;
+                context.CLIENTE_ENDERECO
+                   .Where(p => p.IDENDERECO == endereco.IDENDERECO)
+                   .ToList()
+                   .ForEach(x =>
+                   {
+                       x.BAIRRO = endereco.BAIRRO;
+                       x.CEP = endereco.CEP;
+                       x.CIDADE = endereco.CIDADE;
+                       x.COMPLEMENTO = endereco.COMPLEMENTO;
+                       x.ENDERECO = endereco.ENDERECO;
+                       x.IDCLIENTE = endereco.IDCLIENTE;
+                       x.IDENDERECO = endereco.IDENDERECO;
+                       x.NUM = endereco.NUM;
+                       x.UF = endereco.UF;
+                   });
+                context.SaveChanges();
+                return endereco;
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "Token Inválido");
+            }
+
+
         }
         /// <summary>
         /// Recupera lista de endereços do cliente
@@ -94,11 +123,20 @@ namespace APIRestTedie.Controllers
         /// 
         [HttpGet]
         [Route("endereco/idcliente/{id}")]
-        public  List<CLIENTE_ENDERECO> GetEnderecoPorID(int id)
+        public dynamic GetEnderecoPorID(int id,string token)
         {
-            IQueryable<CLIENTE_ENDERECO> lst = from p in context.CLIENTE_ENDERECO.Where(w=> w.IDCLIENTE == id) select p;
+            if (Utils.ValidateToken(token))
+            {
+                IQueryable<CLIENTE_ENDERECO> lst = from p in context.CLIENTE_ENDERECO.Where(w => w.IDCLIENTE == id) select p;
 
-            return lst.ToList();
+                return lst.ToList();
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "Token Inválido");
+            }
+
+          
         }
         // GET: api/Endereco/5
         /// <summary>
@@ -108,26 +146,34 @@ namespace APIRestTedie.Controllers
         /// <returns></returns>
         ///  [HttpGet]
         [Route("endereco/{cep}")]
-        public  async Task<EnderecoCEP> GetEnderecoPorCEP(string cep)
+        public async Task<dynamic> GetEnderecoPorCEP(string cep,string token)
         {
-            ServicePointManager.Expect100Continue = true;
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-            using (HttpClient client = new HttpClient())
+            if (Utils.ValidateToken(token))
             {
-                client.BaseAddress = new Uri("https://viacep.com.br/");
-                var resp = await client.GetAsync("ws/" + cep + "/json");
-                if (resp.IsSuccessStatusCode)
+                ServicePointManager.Expect100Continue = true;
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                using (HttpClient client = new HttpClient())
                 {
-                    string response = resp.Content.ReadAsStringAsync().Result;
-                    EnderecoCEP end = JsonConvert.DeserializeObject<EnderecoCEP>(response) ;
-                    return end;
-                }
-                else
-                {
-                    return null;
-                }
+                    client.BaseAddress = new Uri("https://viacep.com.br/");
+                    var resp = await client.GetAsync("ws/" + cep + "/json");
+                    if (resp.IsSuccessStatusCode)
+                    {
+                        string response = resp.Content.ReadAsStringAsync().Result;
+                        EnderecoCEP end = JsonConvert.DeserializeObject<EnderecoCEP>(response);
+                        return end;
+                    }
+                    else
+                    {
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Favor validar o CEP");
+                    }
 
+                }
             }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "Token Inválido");
+            }
+           
         }
     }
 }

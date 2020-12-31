@@ -1,4 +1,5 @@
-﻿using System;
+﻿using APIRestTedie.Util;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -20,19 +21,27 @@ namespace APIRestTedie.Controllers
         /// <returns></returns>
         /// 
         [Route("api/categorias")]
-        public dynamic GetCategoria()
+        public dynamic GetCategoria(string token)
         {
-            var lst = (from p in context.CATEGORIA
-                       select new
-                       {
-                           p.CATEGORIAPAI,
-                           p.DATACADASTRO,
-                           p.IDCATEGORIA,
-                           p.NOMECATEGORIA,
-                           p.STATUS
-                           
-                       }) ;
-            return lst;
+            if (Utils.ValidateToken(token))
+            {
+                var lst = (from p in context.CATEGORIA
+                           select new
+                           {
+                               p.CATEGORIAPAI,
+                               p.DATACADASTRO,
+                               p.IDCATEGORIA,
+                               p.NOMECATEGORIA,
+                               p.STATUS
+
+                           });
+                return lst;
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "Token Inválido");
+            }
+            
         }
         /// <summary>
         /// Sub-Categorias de uma determinada categoria
@@ -41,41 +50,56 @@ namespace APIRestTedie.Controllers
         /// <returns></returns>
         /// 
         [Route("api/categorias/{idCategoria}/sub")]
-        public dynamic GetSubCategoria(int idCategoria)
+        public dynamic GetSubCategoria(int idCategoria,string token)
         {
-            var lst = (from p in context.CATEGORIA
-                       where p.CATEGORIAPAI == idCategoria
-                       select new
-                       {
-                           p.CATEGORIAPAI,
-                           p.DATACADASTRO,
-                           p.IDCATEGORIA,
-                           p.NOMECATEGORIA,
-                           p.STATUS
+            if (Utils.ValidateToken(token))
+            {
+                var lst = (from p in context.CATEGORIA
+                           where p.CATEGORIAPAI == idCategoria
+                           select new
+                           {
+                               p.CATEGORIAPAI,
+                               p.DATACADASTRO,
+                               p.IDCATEGORIA,
+                               p.NOMECATEGORIA,
+                               p.STATUS
 
-                       });
-            return lst;
+                           });
+                return lst;
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "Token Inválido");
+            }
+          
         }
         /// <summary>
         /// Categorias da Home ( Não tem categoria Pai)
         /// </summary>
-        /// <param name="idCategoria"></param>
         /// <returns></returns>
         [Route("api/home/categorias")]
-        public dynamic GetCategoriasHome()
+        public dynamic GetCategoriasHome(string token)
         {
-            var lst = (from p in context.CATEGORIA
-                       where p.CATEGORIAPAI == 0
-                       select new
-                       {
-                           p.CATEGORIAPAI,
-                           p.DATACADASTRO,
-                           p.IDCATEGORIA,
-                           p.NOMECATEGORIA,
-                           p.STATUS
+            if (Utils.ValidateToken(token))
+            {
+                var lst = (from p in context.CATEGORIA
+                           where p.CATEGORIAPAI == 0
+                           select new
+                           {
+                               p.CATEGORIAPAI,
+                               p.DATACADASTRO,
+                               p.IDCATEGORIA,
+                               p.NOMECATEGORIA,
+                               p.STATUS
 
-                       });
-            return lst;
+                           });
+                return lst;
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, "Token Inválido");
+            }
+        
         }
     }
 }
